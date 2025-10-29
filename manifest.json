@@ -1,0 +1,13 @@
+{
+  "Author": "不记得了",
+  "InternalName": "CookScenarioAnalyzer",
+  "Name": "解析种田杯回合信息",
+  "Description": "解析种田杯回合信息",
+  "Changelog": "",
+  "Version": "1.0.0",
+  "Dependencies": [],
+  "Targets": [],
+  "RepositoryUrl": "https://github.com/URA-Plugins/CookScenarioAnalyzer",
+  "DownloadUrl": "https://gh.shuise.dev/github.com/URA-Plugins/CookScenarioAnalyzer/releases/latest/download/CookScenarioAnalyzer.zip",
+  "LastUpdate": "1751719983"
+}
