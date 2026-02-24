@@ -11,7 +11,6 @@ namespace CookScenarioAnalyzer
         [PluginDescription("解析种田杯回合信息")]
         public string Name => "CookScenarioAnalyzer";
         public string Author => "不记得了";
-        public Version Version => new(1, 0, 0);
         public string[] Targets => [];
         public async Task UpdatePlugin(ProgressContext ctx)
         {
@@ -22,7 +21,7 @@ namespace CookScenarioAnalyzer
             var json = await resp.Content.ReadAsStringAsync();
             var jo = JObject.Parse(json);
 
-            var isLatest = ("v" + Version.ToString()).Equals("v" + jo["tag_name"]?.ToString());
+            var isLatest = ("v" + ((IPlugin)this).Version.ToString()).Equals("v" + jo["tag_name"]?.ToString());
             if (isLatest)
             {
                 progress.Increment(progress.MaxValue);
