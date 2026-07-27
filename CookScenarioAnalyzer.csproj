@@ -1,15 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <IsUraPlugin>true</IsUraPlugin>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Version>1.0.0</Version>
+    <PluginInternalName>CookScenarioAnalyzer</PluginInternalName>
+    <PluginAuthor>不记得了</PluginAuthor>
+    <PluginDisplayName>解析种田杯回合信息</PluginDisplayName>
+    <PluginDescription>解析种田杯回合信息</PluginDescription>
+    <PluginRepositoryUrl>https://github.com/URA-Plugins/CookScenarioAnalyzer</PluginRepositoryUrl>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\UmamusumeResponseAnalyzer\UmamusumeResponseAnalyzer\UmamusumeResponseAnalyzer.csproj" />
-    <ProjectReference Include="..\EventLoggerPlugin\EventLoggerPlugin.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <Compile Update="i18n\Game.Designer.cs">
@@ -24,12 +26,6 @@
       <LastGenOutput>Game.Designer.cs</LastGenOutput>
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="manifest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

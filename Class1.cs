@@ -1,71 +1,53 @@
-﻿using Newtonsoft.Json.Linq;
-using Spectre.Console;
-using System.IO.Compression;
-using UmamusumeResponseAnalyzer;
+using Gallop;
+using Gallop.Endpoints;
+using UmamusumeResponseAnalyzer.TerminalGui;
 using UmamusumeResponseAnalyzer.Plugin;
 
-namespace CookScenarioAnalyzer
+namespace CookScenarioAnalyzer;
+
+public sealed class CookScenarioAnalyzer : IPlugin
 {
-    public class CookScenarioAnalyzer : IPlugin
+    const string WorkspaceTitle = "CookScenarioAnalyzer";
+    const string TrainingPanelKey = "training";
+
+    Workspace? workspace;
+    bool hasPublishedTrainingPanel;
+    int currentTurn;
+
+    public void Initialize(IPluginContext context)
     {
-        [PluginDescription("解析种田杯回合信息")]
-        public string Name => "CookScenarioAnalyzer";
-        public string Author => "不记得了";
-        public string[] Targets => [];
-        public async Task UpdatePlugin(ProgressContext ctx)
-        {
-            var progress = ctx.AddTask($"[[{Name}]] 更新");
+        hasPublishedTrainingPanel = false;
+        currentTurn = 0;
+    }
 
-            using var client = new HttpClient();
-            using var resp = await client.GetAsync($"https://api.github.com/repos/URA-Plugins/{Name}/releases/latest");
-            var json = await resp.Content.ReadAsStringAsync();
-            var jo = JObject.Parse(json);
+    public void Dispose()
+    {
+        currentTurn = 0;
+        if (!hasPublishedTrainingPanel)
+            return;
 
-            var isLatest = ("v" + ((IPlugin)this).Version.ToString()).Equals("v" + jo["tag_name"]?.ToString());
-            if (isLatest)
-            {
-                progress.Increment(progress.MaxValue);
-                progress.StopTask();
-                return;
-            }
-            progress.Increment(25);
+        workspace!.RemovePanel(TrainingPanelKey);
+        hasPublishedTrainingPanel = false;
+    }
 
-            var downloadUrl = jo["assets"][0]["browser_download_url"].ToString();
-            if (Config.Updater.IsGithubBlocked && !Config.Updater.ForceUseGithubToUpdate)
-            {
-                downloadUrl = downloadUrl.Replace("https://", "https://gh.shuise.dev/");
-            }
-            using var msg = await client.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
-            using var stream = await msg.Content.ReadAsStreamAsync();
-            var buffer = new byte[8192];
-            while (true)
-            {
-                var read = await stream.ReadAsync(buffer);
-                if (read == 0)
-                    break;
-                progress.Increment(read / msg.Content.Headers.ContentLength ?? 1 * 0.5);
-            }
-            using var archive = new ZipArchive(stream);
-            archive.ExtractToDirectory(Path.Combine("Plugins", Name), true);
-            progress.Increment(25);
+    [ResponseAnalyzer<GameApi.SingleModeCook.CheckEvent>(1)]
+    public ValueTask Analyze(SingleModeCookCheckEventResponse response)
+    {
+        var data = response.data;
+        if (data.home_info.command_info_array is null || data.chara_info.state is 2 or 3)
+            return ValueTask.CompletedTask;
+        if ((data.unchecked_event_array is { Length: > 0 }) || data.race_start_info is not null)
+            return ValueTask.CompletedTask;
 
-            progress.StopTask();
-        }
-
-        [Analyzer(priority: 1)]
-        public void Analyzer(JObject jo)
-        {
-            if (!jo.HasCharaInfo()) return;
-            if (jo["data"] is null || jo["data"] is not JObject data) return;
-            if (data["chara_info"] is null || data["chara_info"] is not JObject chara_info) return;
-            if (chara_info["scenario_id"].ToInt() != (int)ScenarioType.Cook) return;
-            var state = chara_info["state"].ToInt();
-            if (chara_info != null && data["home_info"]?["command_info_array"] != null && data["race_reward_info"].IsNull() && !(state is 2 or 3)) //根据文本简单过滤防止重复、异常输出
-            {
-                var @event = jo.ToObject<Gallop.SingleModeCheckEventResponse>();
-                if ((@event.data.unchecked_event_array != null && @event.data.unchecked_event_array.Length > 0) || @event.data.race_start_info != null) return;
-                Handlers.ParseCookCommandInfo(@event);
-            }
-        }
+        var content = Handlers.ParseCookCommandInfo(response, ref currentTurn);
+        var workspace = this.workspace ??= Workspace.Create(WorkspaceTitle);
+        workspace.SetPanel(
+            TrainingPanelKey,
+            "训练分析",
+            content,
+            fullBleed: true,
+            switchToWorkspace: !hasPublishedTrainingPanel);
+        hasPublishedTrainingPanel = true;
+        return ValueTask.CompletedTask;
     }
 }

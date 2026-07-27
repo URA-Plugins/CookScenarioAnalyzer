@@ -1,24 +1,11 @@
 ﻿using System;
 using System.Collections.Frozen;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static UmamusumeResponseAnalyzer.Localization.Game;
 
 namespace CookScenarioAnalyzer
 {
     public static partial class GameGlobal
     {
         public static readonly int[] TrainIds = [101, 105, 102, 103, 106];
-        public static readonly FrozenDictionary<int, string> TrainNames = new Dictionary<int, string>
-        {
-            { 101, I18N_Speed },
-            { 105, I18N_Stamina },
-            { 102, I18N_Power },
-            { 103, I18N_Nuts },
-            { 106, I18N_Wiz }
-        }.ToFrozenDictionary();
         public static readonly FrozenDictionary<int, int> ToTrainId = new Dictionary<int, int>
         {
             [1101] = 101,
@@ -99,12 +86,5 @@ namespace CookScenarioAnalyzer
             { 902, 2 },
             { 906, 4 }
         }.ToFrozenDictionary();
-        public static readonly Dictionary<int, int[]> FiveStatusLimit = new Dictionary<int, int[]>
-        {
-            { 6, [ 2000, 2000, 1800, 1800, 1400] },
-            { 7, [ 2200, 1800, 1800, 1800, 1400] },
-            { 8, [ 2300, 1000, 2200, 2200, 1500] },
-            { 9, [ 2300, 2200, 1800, 1400, 1400] }
-        };
     }
 }
