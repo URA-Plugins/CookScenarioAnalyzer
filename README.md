@@ -17,3 +17,10 @@
 ```
 
 `historyLimit` 的有效范围是 `0` 到 `1000`，默认值为 `100`。设为 `0` 时不保留历史记录，面板仍显示最近一次成功分析结果。
+
+## 构建
+
+```powershell
+git -c core.longpaths=true submodule update --init --recursive
+dotnet build .\CookScenarioAnalyzer.csproj -c Release -m:1 -p:RuntimeIdentifier=win-x64 -p:SelfContained=false -p:PlatformTarget=AnyCPU -p:DeployUraPluginToLocalAppDataOnBuild=false
+```
