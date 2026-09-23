@@ -70,7 +70,7 @@ public sealed class CookScenarioAnalyzer : IPlugin
         currentTurn = 0;
     }
 
-    public void Dispose()
+    public ValueTask DisposeAsync()
     {
         HistoryPanelView? view;
         Workspace? publishedWorkspace;
@@ -94,6 +94,7 @@ public sealed class CookScenarioAnalyzer : IPlugin
 
         currentTurn = 0;
         publishedWorkspace?.RemovePanel(TrainingPanelKey);
+        return ValueTask.CompletedTask;
     }
 
     public ValueTask Analyze(SingleModeCookCheckEventResponse response)
