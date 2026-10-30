@@ -1,5 +1,7 @@
 # CookScenarioAnalyzer
 
+本插件已停止维护。
+
 种田杯训练回合分析插件。
 
 ## History
